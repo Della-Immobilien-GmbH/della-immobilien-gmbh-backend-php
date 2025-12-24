@@ -1,0 +1,32 @@
+name: Build and Deploy Full App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Backend
+        uses: actions/checkout@v4
+        with:
+          path: backend
+
+      - name: Push to Fullstack Repo
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git clone https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/Della-Immobilien-GmbH/della-immobilien-gmbh-fullstack.git out
+          rsync -av --delete \
+            --exclude=".git" \
+            --exclude=".github" \
+            --include="public/**/index.php" \
+            --exclude="public/**" \
+            backend/ out/
+          cd out
+          git add .
+          git commit -m "Deploy from 'della-immobilien-gmbh-backend-php' repo $GITHUB_SHA" || echo "No changes to commit"
+          git push
