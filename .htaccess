@@ -9,4 +9,5 @@ RewriteRule ^ - [L]
 RewriteRule ^api(/.*)?$ public/index.php [L,QSA]
 
 # All other routes go to Angular
+RewriteCond %{REQUEST_URI} !^/api/
 RewriteRule ^ public/index.html [L]
